@@ -2,13 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: echo
-  labels:
-    app: echo
 spec:
   selector:
     matchLabels:
       app: echo
-  replicas: 3
   template:
     metadata:
       labels:

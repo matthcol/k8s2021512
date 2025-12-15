@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-env
+data:
+  NGINX_HOST: k8s.nginx.org
+  NGINX_PORT: "90"
