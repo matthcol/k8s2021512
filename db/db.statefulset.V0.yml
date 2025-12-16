@@ -42,20 +42,6 @@ spec:
               name: sql-init
             - mountPath: /var/lib/postgresql/18/docker
               name: db-data
-          # probes
-          livenessProbe: # impact => restart
-            tcpSocket:
-              port: 5432
-            initialDelaySeconds: 5
-            periodSeconds: 5
-          readinessProbe: # impact => service 
-            exec:
-              command:
-                - sh
-                - -c
-                - pg_isready -U "${POSTGRES_USER}" -d "${POSTGRES_DB}"
-            initialDelaySeconds: 5
-            periodSeconds: 5
       volumes:
         - name: sql-init
           configMap:

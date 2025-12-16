@@ -9,4 +9,5 @@ def is_alive():
 
 @router.get("/ready")
 def is_ready():
+    # TODO: requete sur la base
     return {"status": "ready"}

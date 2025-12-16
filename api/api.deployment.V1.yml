@@ -14,20 +14,9 @@ spec:
       labels:
         app: movieapi
     spec:
-      initContainers:
-      - name: wait-for-db
-        image: busybox:1.37
-        command: 
-          - sh
-          - -c
-          - |
-            until nc -z dbmovie-0.dbmovie-service 5432; do
-              echo "Waiting for database ..."
-              sleep 2;
-            done 
       containers:
       - name: movieapi
-        image: movieapi:3.0
+        image: movieapi:1.0
         env:
           - name: DB_HOST
             value: "dbmovie-0.dbmovie-service" # nom géré par le service db (ClusterIp Headless)
@@ -50,15 +39,3 @@ spec:
                 key: PASSWORD
           - name: DB_URL
             value: "postgresql+psycopg2://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
-        livenessProbe:
-          httpGet:
-            path: /alive
-            port: 8080
-          initialDelaySeconds: 3
-          periodSeconds: 30
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 8080
-          initialDelaySeconds: 6
-          periodSeconds: 30

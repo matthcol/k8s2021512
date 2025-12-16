@@ -217,10 +217,109 @@ kubectl get po -l app=movieapi -o jsonpath='{range .items[*]}{.metadata.name}{"\
 
 Test API:
 
+```
 kubectl run test-curl -it --rm --restart=Never --image=curlimages/curl -- sh
     curl -s -w "[%{remote_ip}] %{http_code} %{time_total}s\n " -G http://movieapi:90/movies/
     curl -s -w "[%{remote_ip}] %{http_code} %{time_total}s\n " -G http://movieapi:90/persons/
     seq 1000 | xargs -n1 -P10 -I{} curl -s -w "[%{remote_ip}] %{http_code} %{time_total}s\n " -G http://movieapi:90/movies/ -o /dev/null
+```
+
+## Probes
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+
+Catégorie de probe (délai défaut 10s):
+- livenessProbe: utile pour le restart (en continu)
+- readinessProbe: utile pour les services (en continu)
+- startupProbe:  utilisée jusqu'au 1er succes => puis relais à liveness/readiness
+
+Type d'outil probe:
+- httpGet (API, frontend, ...) => OK si status est 2xx ou 3xx
+- tcpSocket (DB, ...) => OK si réponse
+- exec (any command) => OK si status 0
+
+Application à la base de données (tcpSocket pour liveness et exec pour readiness)
+```
+kubectl delete sts dbmovie
+kubectl delete pvc db-data-dbmovie-0 db-data-dbmovie-1 db-data-dbmovie-2
+
+kubectl apply -f db.statefulset.yml
+kubectl get pod,svc -l app=dbmovie
+```
+
+Application à l'API (httpGet pour liveness et readiness)
+```
+kubectl apply -f .\api.deployment.yml
+kubectl get all -l app=movieapi -o wide 
+```
+
+## Namespaces
+```
+kubectl get all         # default namespace : default
+kubectl get all -A      # all namespaces
+kubetcl get -n default
+kubetcl get -n kube-system
+```
+
+Avantages:
+* differents environnements : dev, staging, prod
+* multi-tenant
+* DNS : routage relatif au namespace vs routage global (FQDN)
+
+Exemple: 
+    <pod-name>.<headless-service>.<namespace>.svc.cluster.local   # FQDN : global
+    <pod-name>.<headless-service>                                 # current namespace
+
+kubectl create namespace moviestack
+
+### Utilisation du namespace : méthode explicite (-n)
+
+kubectl create configmap db-env --from-env-file db/.env -n moviestack
+kubectl get cm -n moviestack
+
+### Utilisation du namespace : méthode explicite (variable d'environnement)
+Powershell:
+```
+$env:KUBECTL_NAMESPACE='moviestack'
+function kctl {
+    kubectl -n $env:KUBECTL_NAMESPACE @args
+}
+```
+
+Bash:
+```
+export KUBECTL_NAMESPACE=moviestack
+alias kctl=kubectl -n $KUBECTL_NAMESPACE
+```
+### Utilisation du namespace : configuration kubectl
+
+```
+kubectl config get-contexts                                     # *         minikube   minikube   minikube   default
+kubectl config set-context --current --namespace moviestack
+kubectl config get-contexts                                     # *         minikube   minikube   minikube   moviestack
+```
+
+### Cleanup namespace default
+```
+kubectl delete all  --all -n default
+kubectl delete pv,pvc,cm,secret --all -n default
+kubectl get pv,pvc,cm,secret -n default
+```
+
+### Stack complet sur namespace particulier
+
+```
+kubectl delete ns moviestack
+.\deploy-stack.ps1
+```
+
+Test DB from API:
+```
+kubectl run -it --rm --restart=Never --image=busybox:1.37 -- bash
+```
+
+
+
+
 
 
 
