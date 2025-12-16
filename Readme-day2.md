@@ -179,22 +179,25 @@ Test API avec Swagger:
 
 
 Diagnostic:
- kubectl get svc,deploy,rs,sts,po -l app=movieapi    
- kubectl get all -l app=movieapi 
- kubectl describe po movieapi-6454c5b874-7kz5g     # NB: variables d'env + image conteneur : movieapi:1.0
- kubectl logs movieapi-6454c5b874-7kz5g
- 
- kubectl get svc,deploy,rs,sts,po -l app=dbmovie    
- kubectl get all -l app=dbmovie 
- kubectl describe po dbmovie-0  
- kubectl logs dbmovie-0  
+```
+kubectl get svc,deploy,rs,sts,po -l app=movieapi    
+kubectl get all -l app=movieapi 
+kubectl describe po movieapi-6454c5b874-7kz5g     # NB: variables d'env + image conteneur : movieapi:1.0
+kubectl logs movieapi-6454c5b874-7kz5g
+
+kubectl get svc,deploy,rs,sts,po -l app=dbmovie    
+kubectl get all -l app=dbmovie 
+kubectl describe po dbmovie-0  
+kubectl logs dbmovie-0  
 
 kubectl get all -l app=movieapi -o wide   # l'image est préciséee sur deployment + replicaset : movieapi:1.0
 kubectl get po -l app=movieapi -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.containers[0].image}{"\t"}{..phase}{"\n"}{end}'
+```
 
 ## Mise à jour d'1 déploiement
-
+```
 docker build -t movieapi:2.0 api-v2.0
+```
 
 Changer l'image du deploiement: 
 - changer le YAML + apply
@@ -269,12 +272,15 @@ Exemple:
     <pod-name>.<headless-service>.<namespace>.svc.cluster.local   # FQDN : global
     <pod-name>.<headless-service>                                 # current namespace
 
+```
 kubectl create namespace moviestack
+```
 
 ### Utilisation du namespace : méthode explicite (-n)
-
+```
 kubectl create configmap db-env --from-env-file db/.env -n moviestack
 kubectl get cm -n moviestack
+```
 
 ### Utilisation du namespace : méthode explicite (variable d'environnement)
 Powershell:
@@ -300,13 +306,13 @@ kubectl config get-contexts                                     # *         mini
 
 ### Cleanup namespace default
 ```
-kubectl delete all  --all -n default
+kubectl delete all --all -n default
 kubectl delete pv,pvc,cm,secret --all -n default
 kubectl get pv,pvc,cm,secret -n default
 ```
 
 ### Stack complet sur namespace particulier
-
+(Re)créer le stack
 ```
 kubectl delete ns moviestack
 .\deploy-stack.ps1
@@ -316,6 +322,9 @@ Test DB from API:
 ```
 kubectl run -it --rm --restart=Never --image=busybox:1.37 -- bash
 ```
+
+## Helm
+Outil de gestion de configuration et de stack k8s: https://helm.sh/
 
 
 

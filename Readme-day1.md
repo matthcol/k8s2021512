@@ -355,8 +355,10 @@ Image : postgres
 - POSTGRES_USER
 - POSTGRES_PASSWORD
 
+```
 kubectl create cm db-env --from-env-file .env
 kubectl apply -f db.pod.yml
 kubectl logs dbmovie
 kubectl exec -it dbmovie -- bash
     psql -U movie -d dbmovie -h 127.0.0.1
+```
