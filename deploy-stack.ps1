@@ -1,5 +1,7 @@
-kubectl create namespace moviestack
-kubectl config set-context --current --namespace moviestack
+$KUBECTL_NAMESPACE='moviestack'
+
+kubectl create namespace $KUBECTL_NAMESPACE
+kubectl config set-context --current --namespace $KUBECTL_NAMESPACE
 
 kubectl create configmap db-env --from-env-file db/.env 
 kubectl create secret generic db-secret --from-env-file db/.env-secret
