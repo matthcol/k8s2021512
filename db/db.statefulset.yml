@@ -8,8 +8,8 @@ spec:
   selector:
     matchLabels:
       app: dbmovie
-  serviceName: movie-service
-  replicas: 1
+  serviceName: dbmovie-service
+  replicas: 2
   template:
     metadata:
       labels:
