@@ -215,6 +215,12 @@ kubectl rollout status deploy/movieapi
 kubectl get po -l app=movieapi -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.containers[0].image}{"\t"}{..phase}{"\n"}{end}'
 ```
 
+Test API:
+
+kubectl run test-curl -it --rm --restart=Never --image=curlimages/curl -- sh
+    curl -s -w "[%{remote_ip}] %{http_code} %{time_total}s\n " -G http://movieapi:90/movies/
+    curl -s -w "[%{remote_ip}] %{http_code} %{time_total}s\n " -G http://movieapi:90/persons/
+    seq 1000 | xargs -n1 -P10 -I{} curl -s -w "[%{remote_ip}] %{http_code} %{time_total}s\n " -G http://movieapi:90/movies/ -o /dev/null
 
 
 
