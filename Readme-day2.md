@@ -178,6 +178,43 @@ Test API avec Swagger:
     http://localhost:90/docs
 
 
+Diagnostic:
+ kubectl get svc,deploy,rs,sts,po -l app=movieapi    
+ kubectl get all -l app=movieapi 
+ kubectl describe po movieapi-6454c5b874-7kz5g     # NB: variables d'env + image conteneur : movieapi:1.0
+ kubectl logs movieapi-6454c5b874-7kz5g
+ 
+ kubectl get svc,deploy,rs,sts,po -l app=dbmovie    
+ kubectl get all -l app=dbmovie 
+ kubectl describe po dbmovie-0  
+ kubectl logs dbmovie-0  
+
+kubectl get all -l app=movieapi -o wide   # l'image est préciséee sur deployment + replicaset : movieapi:1.0
+kubectl get po -l app=movieapi -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.containers[0].image}{"\t"}{..phase}{"\n"}{end}'
+
+## Mise à jour d'1 déploiement
+
+docker build -t movieapi:2.0 api-v2.0
+
+Changer l'image du deploiement: 
+- changer le YAML + apply
+- CLI: kubectl set image 
+
+```
+kubectl set image deploy/movieapi movieapi=movieapi:2.0
+kubectl get po -l app=movieapi -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.containers[0].image}{"\t"}{..phase}{"\n"}{end}'
+kubectl rollout status deploy/movieapi
+kubectl rollout history deploy/movieapi
+
+kubectl rollout undo deploy/movieapi
+kubectl rollout status deploy/movieapi
+kubectl get po -l app=movieapi -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.containers[0].image}{"\t"}{..phase}{"\n"}{end}'
+
+kubectl rollout undo deploy/movieapi --to-revision=2
+kubectl rollout status deploy/movieapi
+kubectl get po -l app=movieapi -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.containers[0].image}{"\t"}{..phase}{"\n"}{end}'
+```
+
 
 
 
