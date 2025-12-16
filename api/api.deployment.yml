@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movieapi
+  labels:
+    app: movieapi
+spec:
+  selector:
+    matchLabels:
+      app: movieapi
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: movieapi
+    spec:
+      containers:
+      - name: movieapi
+        image: movieapi:1.0
+        env:
+          - name: DB_HOST
+            value: "dbmovie-0.dbmovie-service" # nom géré par le service db (ClusterIp Headless)
+          - name: DB_PORT
+            value: "5432"
+          - name: DB_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: db-env
+                key: DBNAME
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: db-secret
+                key: USER
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: db-secret
+                key: PASSWORD
+          - name: DB_URL
+            value: "postgresql+psycopg2://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)"

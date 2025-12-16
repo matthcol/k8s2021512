@@ -168,6 +168,17 @@ docker image ls              # movieapi:1.0   190M
 DB_URL = postgresql+psycopg2://user:password@host:5432/mydatabase
 
 
+```
+kubectl apply -f api.deployment.yml
+kubectl apply -f api.service.yml
+minikube tunnel     # si pas déjà lancé
+```
+
+Test API avec Swagger:
+    http://localhost:90/docs
+
+
+
 
 
 
